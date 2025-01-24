@@ -16,7 +16,7 @@ export async function POST(request: Request) {
             { first_name: data.first_name },
             { middle_name: data.middle_name },
             { surname: data.surname },
-            { date_of_birth: data.date_of_birth }
+            { phone_number: data.phone_number }
           ]
         }
       ]

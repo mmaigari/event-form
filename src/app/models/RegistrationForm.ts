@@ -6,7 +6,7 @@ const registrationFormSchema = new Schema({
   surname: { type: String, required: true },
   gender: { type: String, required: true, enum: ['Male', 'Female'] },
   marital_status: { type: String, required: true, enum: ['Married', 'Single', 'Widow'] },
-  date_of_birth: { type: Date, required: true },
+  date_of_birth: { type: Date, required: false },
   state: { type: String, required: true },
   lga: { type: String, required: true },
   ward: { type: String, required: true },

@@ -1,4 +1,25 @@
-import mongoose, { Schema } from 'mongoose';
+import mongoose, { Schema, Document } from 'mongoose';
+
+interface IRegistrationForm extends Document {
+  first_name: string;
+  middle_name: string;
+  surname: string;
+  gender: 'Male' | 'Female';
+  marital_status: 'Married' | 'Single' | 'Widow';
+  date_of_birth: Date;
+  state: string;
+  lga: string;
+  ward: string;
+  email_address: string;
+  phone_number: string;
+  year_of_musabaqa: number;
+  home_address: string;
+  bank_details: {
+    bank_name: string;
+    account_name: string;
+    account_number: string;
+  };
+}
 
 const registrationFormSchema = new Schema({
   first_name: { type: String, required: true },
@@ -56,7 +77,7 @@ registrationFormSchema.index({
 });
 
 // Pre-save middleware to check duplicates
-registrationFormSchema.pre('save', async function(next) {
+registrationFormSchema.pre('save', async function(this: IRegistrationForm, next) {
   const doc = this;
   try {
     // Check for existing entry with same details
@@ -97,6 +118,6 @@ registrationFormSchema.pre('save', async function(next) {
   }
 });
 
-const RegistrationForm = mongoose.models.RegistrationForm || mongoose.model('RegistrationForm', registrationFormSchema);
+const RegistrationForm = mongoose.models.RegistrationForm || mongoose.model<IRegistrationForm>('RegistrationForm', registrationFormSchema);
 
 export default RegistrationForm;
