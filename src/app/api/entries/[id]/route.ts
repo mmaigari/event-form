@@ -2,14 +2,10 @@ import { NextResponse } from 'next/server';
 import connectMongoDB from '@/lib/mongodb';
 import RegistrationForm from '@/models/RegistrationForm';
 
-interface Params {
-  id: string;
-}
-
 export async function GET(
-  _request: Request,
-  context: { params: Params }
-): Promise<NextResponse> {
+  request: Request,
+  context: { params: { id: string } }
+) {
   try {
     await connectMongoDB();
     const entry = await RegistrationForm.findById(context.params.id);
@@ -27,8 +23,8 @@ export async function GET(
 
 export async function PUT(
   request: Request,
-  context: { params: Params }
-): Promise<NextResponse> {
+  context: { params: { id: string } }
+) {
   try {
     const body = await request.json();
     await connectMongoDB();
@@ -46,9 +42,9 @@ export async function PUT(
 }
 
 export async function DELETE(
-  _request: Request,
-  context: { params: Params }
-): Promise<NextResponse> {
+  request: Request,
+  context: { params: { id: string } }
+) {
   try {
     await connectMongoDB();
     const entry = await RegistrationForm.findByIdAndDelete(context.params.id);
