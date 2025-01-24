@@ -1,101 +1,349 @@
+'use client'
+import { useState } from 'react';
 import Image from "next/image";
 
-export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+interface FormData {
+  first_name: string;
+  middle_name: string;
+  surname: string;
+  gender: string;
+  marital_status: string;
+  date_of_birth: string;
+  state: string;
+  lga: string;
+  ward: string;
+  email_address: string;
+  phone_number: string;
+  year_of_musabaqa: number;
+  home_address: string;
+  bank_details: {
+    bank_name: string;
+    account_name: string;
+    account_number: string;
+  };
+}
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+export default function Home() {
+  const [formData, setFormData] = useState<FormData>({
+    first_name: '',
+    middle_name: '',
+    surname: '',
+    gender: '',
+    marital_status: '',
+    date_of_birth: '',
+    state: '',
+    lga: '',
+    ward: '',
+    email_address: '',
+    phone_number: '',
+    year_of_musabaqa: 0,
+    home_address: '',
+    bank_details: {
+      bank_name: '',
+      account_name: '',
+      account_number: ''
+    }
+  });
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+
+    try {
+      // Check for duplicates first
+      const checkDuplicate = await fetch('/api/check-duplicate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+      });
+
+      const duplicateCheck = await checkDuplicate.json();
+
+      if (duplicateCheck.isDuplicate) {
+        alert('A record with these details already exists.');
+        setIsSubmitting(false);
+        return;
+      }
+
+      // If no duplicate, proceed with submission
+      const response = await fetch('/api/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+      });
+
+      if (response.ok) {
+        alert('Form submitted successfully!');
+        // Reset form
+        setFormData({
+          first_name: '',
+          middle_name: '',
+          surname: '',
+          gender: '',
+          marital_status: '',
+          date_of_birth: '',
+          state: '',
+          lga: '',
+          ward: '',
+          email_address: '',
+          phone_number: '',
+          year_of_musabaqa: 0,
+          home_address: '',
+          bank_details: {
+            bank_name: '',
+            account_name: '',
+            account_number: ''
+          }
+        });
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Failed to submit form. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-100 py-8 px-4">
+      <div className="max-w-3xl mx-auto bg-white p-8 rounded-lg shadow-lg">
+        <h1 className="text-2xl font-bold text-black text-center mb-8">Registration Form</h1>
+        <form onSubmit={handleSubmit} className="space-y-8">
+          {/* Personal Information */}
+          <section className="space-y-6">
+            <h2 className="text-xl font-semibold text-black">Personal Information</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label className="block text-sm font-medium text-black mb-1">First Name</label>
+                <input
+                  type="text"
+                  required
+                  className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-black bg-white focus:border-blue-500 focus:ring-blue-500"
+                  value={formData.first_name}
+                  onChange={(e) => setFormData({...formData, first_name: e.target.value})}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-black">Middle Name</label>
+                <input
+                  type="text"
+                  required
+                  className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-black bg-white focus:border-blue-500 focus:ring-blue-500"
+                  value={formData.middle_name}
+                  onChange={(e) => setFormData({...formData, middle_name: e.target.value})}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-black">Surname</label>
+                <input
+                  type="text"
+                  required
+                  className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-black bg-white focus:border-blue-500 focus:ring-blue-500"
+                  value={formData.surname}
+                  onChange={(e) => setFormData({...formData, surname: e.target.value})}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-black">Date of Birth</label>
+                <input
+                  type="date"
+                  required
+                  className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-black bg-white focus:border-blue-500 focus:ring-blue-500"
+                  value={formData.date_of_birth}
+                  onChange={(e) => setFormData({...formData, date_of_birth: e.target.value})}
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label className="block text-sm font-medium text-black mb-2">Gender</label>
+                <div className="mt-2 space-x-4">
+                  {['Male', 'Female'].map((option) => (
+                    <label key={option} className="inline-flex items-center text-black">
+                      <input
+                        type="radio"
+                        name="gender"
+                        value={option}
+                        required
+                        checked={formData.gender === option}
+                        onChange={(e) => setFormData({...formData, gender: e.target.value})}
+                        className="form-radio text-blue-600"
+                      />
+                      <span className="ml-2">{option}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-black">Marital Status</label>
+                <div className="mt-2 space-x-4">
+                  {['Married', 'Single', 'Widow'].map((option) => (
+                    <label key={option} className="inline-flex items-center text-black">
+                      <input
+                        type="radio"
+                        name="marital_status"
+                        value={option}
+                        required
+                        checked={formData.marital_status === option}
+                        onChange={(e) => setFormData({...formData, marital_status: e.target.value})}
+                        className="form-radio text-blue-600"
+                      />
+                      <span className="ml-2">{option}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* Contact Information */}
+          <section className="space-y-6">
+            <h2 className="text-xl font-semibold text-black">Contact Information</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label className="block text-sm font-medium text-black">Email Address</label>
+                <input
+                  type="email"
+                  required
+                  className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-black bg-white focus:border-blue-500 focus:ring-blue-500"
+                  value={formData.email_address}
+                  onChange={(e) => setFormData({...formData, email_address: e.target.value})}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-black">Phone Number</label>
+                <input
+                  type="tel"
+                  required
+                  className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-black bg-white focus:border-blue-500 focus:ring-blue-500"
+                  value={formData.phone_number}
+                  onChange={(e) => setFormData({...formData, phone_number: e.target.value})}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-black">Year of Musabaqa</label>
+                <input
+                  type="number"
+                  required
+                  min="1900"
+                  max={new Date().getFullYear()}
+                  className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-black bg-white focus:border-blue-500 focus:ring-blue-500"
+                  value={formData.year_of_musabaqa}
+                  onChange={(e) => setFormData({
+                    ...formData, 
+                    year_of_musabaqa: parseInt(e.target.value) || 0
+                  })}
+                />
+              </div>
+            </div>
+          </section>
+
+          {/* Location Information */}
+          <section className="space-y-6">
+            <h2 className="text-xl font-semibold text-black">Location Information</h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div>
+                <label className="block text-sm font-medium text-black">State</label>
+                <input
+                  type="text"
+                  required
+                  className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-black bg-white focus:border-blue-500 focus:ring-blue-500"
+                  value={formData.state}
+                  onChange={(e) => setFormData({...formData, state: e.target.value})}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-black">LGA</label>
+                <input
+                  type="text"
+                  required
+                  className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-black bg-white focus:border-blue-500 focus:ring-blue-500"
+                  value={formData.lga}
+                  onChange={(e) => setFormData({...formData, lga: e.target.value})}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-black">Ward</label>
+                <input
+                  type="text"
+                  required
+                  className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-black bg-white focus:border-blue-500 focus:ring-blue-500"
+                  value={formData.ward}
+                  onChange={(e) => setFormData({...formData, ward: e.target.value})}
+                />
+              </div>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-black">Home Address</label>
+              <textarea
+                required
+                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-black bg-white focus:border-blue-500 focus:ring-blue-500"
+                value={formData.home_address}
+                onChange={(e) => setFormData({...formData, home_address: e.target.value})}
+              />
+            </div>
+          </section>
+
+          {/* Bank Details */}
+          <section className="space-y-6">
+            <h2 className="text-xl font-semibold text-black">Bank Details</h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div>
+                <label className="block text-sm font-medium text-black">Bank Name</label>
+                <input
+                  type="text"
+                  required
+                  className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-black bg-white focus:border-blue-500 focus:ring-blue-500"
+                  value={formData.bank_details.bank_name}
+                  onChange={(e) => setFormData({
+                    ...formData,
+                    bank_details: {...formData.bank_details, bank_name: e.target.value}
+                  })}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-black">Account Name</label>
+                <input
+                  type="text"
+                  required
+                  className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-black bg-white focus:border-blue-500 focus:ring-blue-500"
+                  value={formData.bank_details.account_name}
+                  onChange={(e) => setFormData({
+                    ...formData,
+                    bank_details: {...formData.bank_details, account_name: e.target.value}
+                  })}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-black">Account Number</label>
+                <input
+                  type="text"
+                  required
+                  className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-black bg-white focus:border-blue-500 focus:ring-blue-500"
+                  value={formData.bank_details.account_number}
+                  onChange={(e) => setFormData({
+                    ...formData,
+                    bank_details: {...formData.bank_details, account_number: e.target.value}
+                  })}
+                />
+              </div>
+            </div>
+          </section>
+
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className={`w-full ${
+              isSubmitting ? 'bg-blue-400' : 'bg-blue-600'
+            } text-white py-3 px-4 rounded-md hover:bg-blue-700 transition-colors`}
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+            {isSubmitting ? 'Submitting...' : 'Submit Registration'}
+          </button>
+        </form>
+      </div>
     </div>
   );
 }
