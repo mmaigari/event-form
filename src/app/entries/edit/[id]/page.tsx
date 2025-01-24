@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { use } from 'react';
 
@@ -34,11 +34,7 @@ export default function EditEntry({ params }: { params: Promise<{ id: string }> 
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  useEffect(() => {
-    fetchEntry();
-  }, []);
-
-  const fetchEntry = async () => {
+  const fetchEntry = useCallback(async () => {
     try {
       const response = await fetch(`/api/entries/${resolvedParams.id}`);
       if (!response.ok) throw new Error('Failed to fetch entry');
@@ -50,7 +46,11 @@ export default function EditEntry({ params }: { params: Promise<{ id: string }> 
     } finally {
       setLoading(false);
     }
-  };
+  }, [resolvedParams.id]);
+
+  useEffect(() => {
+    fetchEntry();
+  }, [fetchEntry]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

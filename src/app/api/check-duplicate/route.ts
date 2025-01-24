@@ -30,7 +30,8 @@ export async function POST(request: Request) {
     }
 
     return NextResponse.json({ isDuplicate: false });
-  } catch (error) {
+  } catch (err) {
+    console.error('Check duplicate error:', err);
     return NextResponse.json({ error: "Error checking duplicates" }, { status: 500 });
   }
 }
