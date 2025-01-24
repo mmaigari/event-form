@@ -14,7 +14,8 @@ export async function GET() {
     };
 
     return NextResponse.json({ entries, statistics });
-  } catch (error) {
+  } catch (err) {
+    console.error('GET Error:', err);
     return NextResponse.json({ error: "Error fetching entries" }, { status: 500 });
   }
 }

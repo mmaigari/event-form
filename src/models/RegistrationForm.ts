@@ -77,44 +77,22 @@ registrationFormSchema.index({
 });
 
 // Pre-save middleware to check duplicates
-registrationFormSchema.pre('save', async function(this: IRegistrationForm, next) {
-  const doc = this;
+registrationFormSchema.pre('save', async function(next) {
   try {
-    // Check for existing entry with same details
     const existingPerson = await mongoose.model('RegistrationForm').findOne({
-      first_name: doc.first_name,
-      middle_name: doc.middle_name,
-      surname: doc.surname,
-      date_of_birth: doc.date_of_birth
+      first_name: this.first_name,
+      middle_name: this.middle_name,
+      surname: this.surname,
+      date_of_birth: this.date_of_birth,
+      _id: { $ne: this._id }
     });
 
-    if (existingPerson && existingPerson._id.toString() !== doc._id?.toString()) {
-      throw new Error('A person with these details already exists');
+    if (existingPerson) {
+      throw new Error('Person already registered');
     }
-
-    // Check for duplicate email
-    const existingEmail = await mongoose.model('RegistrationForm').findOne({
-      email_address: doc.email_address,
-      _id: { $ne: doc._id }
-    });
-
-    if (existingEmail) {
-      throw new Error('Email address already registered');
-    }
-
-    // Check for duplicate phone
-    const existingPhone = await mongoose.model('RegistrationForm').findOne({
-      phone_number: doc.phone_number,
-      _id: { $ne: doc._id }
-    });
-
-    if (existingPhone) {
-      throw new Error('Phone number already registered');
-    }
-
     next();
-  } catch (error) {
-    next(error instanceof Error ? error : new Error('An unknown error occurred'));
+  } catch (err: unknown) {
+    next(err as mongoose.CallbackError);
   }
 });
 

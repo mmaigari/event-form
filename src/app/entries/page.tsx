@@ -32,7 +32,7 @@ interface Statistics {
   femaleCount: number;
 }
 
-export default function Entries() {
+export default function EntriesPage() {
   const [entries, setEntries] = useState<Entry[]>([]);
   const [statistics, setStatistics] = useState<Statistics>({
     totalEntries: 0,
@@ -40,7 +40,6 @@ export default function Entries() {
     femaleCount: 0
   });
   const [selectedEntry, setSelectedEntry] = useState<Entry | null>(null);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
 

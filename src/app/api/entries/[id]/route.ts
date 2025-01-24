@@ -10,7 +10,8 @@ export async function GET(
     await connectMongoDB();
     const entry = await RegistrationForm.findById(params.id);
     return NextResponse.json(entry);
-  } catch (error) {
+  } catch (err) {
+    console.error('GET Error:', err);
     return NextResponse.json({ error: "Error fetching entry" }, { status: 500 });
   }
 }
@@ -24,7 +25,8 @@ export async function PUT(
     const body = await request.json();
     const entry = await RegistrationForm.findByIdAndUpdate(params.id, body, { new: true });
     return NextResponse.json(entry);
-  } catch (error) {
+  } catch (err) {
+    console.error('PUT Error:', err);
     return NextResponse.json({ error: "Error updating entry" }, { status: 500 });
   }
 }
@@ -37,7 +39,8 @@ export async function DELETE(
     await connectMongoDB();
     await RegistrationForm.findByIdAndDelete(params.id);
     return NextResponse.json({ message: "Entry deleted" });
-  } catch (error) {
+  } catch (err) {
+    console.error('DELETE Error:', err);
     return NextResponse.json({ error: "Error deleting entry" }, { status: 500 });
   }
 }
