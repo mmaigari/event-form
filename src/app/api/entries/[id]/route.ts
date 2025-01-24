@@ -1,14 +1,11 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import connectMongoDB from '@/lib/mongodb';
 import RegistrationForm from '@/models/RegistrationForm';
 
-interface RouteParams {
-  params: {
-    id: string;
-  };
-}
-
-export async function GET(_request: NextRequest, { params }: RouteParams) {
+export async function GET(
+  request: Request,
+  { params }: { params: { id: string } }
+) {
   try {
     await connectMongoDB();
     const entry = await RegistrationForm.findById(params.id);
@@ -24,9 +21,12 @@ export async function GET(_request: NextRequest, { params }: RouteParams) {
   }
 }
 
-export async function PUT(_request: NextRequest, { params }: RouteParams) {
+export async function PUT(
+  request: Request,
+  { params }: { params: { id: string } }
+) {
   try {
-    const body = await _request.json();
+    const body = await request.json();
     await connectMongoDB();
     const entry = await RegistrationForm.findByIdAndUpdate(params.id, body, { new: true });
     
@@ -41,7 +41,10 @@ export async function PUT(_request: NextRequest, { params }: RouteParams) {
   }
 }
 
-export async function DELETE(_request: NextRequest, { params }: RouteParams) {
+export async function DELETE(
+  request: Request,
+  { params }: { params: { id: string } }
+) {
   try {
     await connectMongoDB();
     const entry = await RegistrationForm.findByIdAndDelete(params.id);
