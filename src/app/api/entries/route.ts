@@ -19,14 +19,3 @@ export async function GET() {
     return NextResponse.json({ error: "Error fetching entries" }, { status: 500 });
   }
 }
-
-function calculateAverageAge(entries: any[]) {
-  const today = new Date();
-  const ages = entries.map(entry => {
-    const birthDate = new Date(entry.date_of_birth);
-    const age = today.getFullYear() - birthDate.getFullYear();
-    return age;
-  });
-  
-  return ages.reduce((a, b) => a + b, 0) / ages.length;
-}
