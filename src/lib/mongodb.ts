@@ -11,14 +11,15 @@ interface MongooseConnection {
   promise: Promise<typeof mongoose> | null;
 }
 
-declare global {
-  var mongoose: MongooseConnection;
-}
+type GlobalWithMongoose = typeof globalThis & {
+  mongoose: MongooseConnection | undefined;
+};
 
-let cached = global.mongoose;
+const globalWithMongoose = global as GlobalWithMongoose;
+const cached = globalWithMongoose.mongoose ?? { conn: null, promise: null };
 
-if (!cached) {
-  cached = global.mongoose = { conn: null, promise: null };
+if (!globalWithMongoose.mongoose) {
+  globalWithMongoose.mongoose = cached;
 }
 
 const connectMongoDB = async (): Promise<typeof mongoose> => {
@@ -27,9 +28,13 @@ const connectMongoDB = async (): Promise<typeof mongoose> => {
   }
 
   if (!cached.promise) {
-    cached.promise = mongoose.connect(MONGODB_URI);
-  }
+    const opts = {
+      bufferCommands: true,
+    };
 
+    cached.promise = mongoose.connect(MONGODB_URI, opts);
+  }
+  
   try {
     cached.conn = await cached.promise;
   } catch (e) {
