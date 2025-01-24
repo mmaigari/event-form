@@ -1,15 +1,18 @@
 import { NextResponse } from 'next/server';
-import { NextRequest } from 'next/server';
 import connectMongoDB from '@/lib/mongodb';
 import RegistrationForm from '@/models/RegistrationForm';
 
+interface Params {
+  id: string;
+}
+
 export async function GET(
-  request: Request,
-  { params }: { params: { id: string } }
-) {
+  _request: Request,
+  context: { params: Params }
+): Promise<NextResponse> {
   try {
     await connectMongoDB();
-    const entry = await RegistrationForm.findById(params.id);
+    const entry = await RegistrationForm.findById(context.params.id);
     
     if (!entry) {
       return NextResponse.json({ error: "Entry not found" }, { status: 404 });
@@ -24,12 +27,12 @@ export async function GET(
 
 export async function PUT(
   request: Request,
-  { params }: { params: { id: string } }
-) {
+  context: { params: Params }
+): Promise<NextResponse> {
   try {
     const body = await request.json();
     await connectMongoDB();
-    const entry = await RegistrationForm.findByIdAndUpdate(params.id, body, { new: true });
+    const entry = await RegistrationForm.findByIdAndUpdate(context.params.id, body, { new: true });
     
     if (!entry) {
       return NextResponse.json({ error: "Entry not found" }, { status: 404 });
@@ -43,12 +46,12 @@ export async function PUT(
 }
 
 export async function DELETE(
-  request: Request,
-  { params }: { params: { id: string } }
-) {
+  _request: Request,
+  context: { params: Params }
+): Promise<NextResponse> {
   try {
     await connectMongoDB();
-    const entry = await RegistrationForm.findByIdAndDelete(params.id);
+    const entry = await RegistrationForm.findByIdAndDelete(context.params.id);
     
     if (!entry) {
       return NextResponse.json({ error: "Entry not found" }, { status: 404 });
