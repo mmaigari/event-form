@@ -1,5 +1,6 @@
 'use client'
 import { useState } from 'react';
+import { NIGERIAN_STATES } from '../constants/states';
 
 interface FormData {
   first_name: string;
@@ -246,13 +247,21 @@ export default function Home() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div>
                 <label className="block text-sm font-medium text-black">State</label>
-                <input
-                  type="text"
-                  required
-                  className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-black bg-white focus:border-blue-500 focus:ring-blue-500"
+                <select
+                  id="state"
+                  name="state"
                   value={formData.state}
-                  onChange={(e) => setFormData({...formData, state: e.target.value})}
-                />
+                  onChange={(e) => setFormData({ ...formData, state: e.target.value })}
+                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                  required
+                >
+                  <option value="">Select a state</option>
+                  {NIGERIAN_STATES.map((state) => (
+                    <option key={state} value={state}>
+                      {state}
+                    </option>
+                  ))}
+                </select>
               </div>
               <div>
                 <label className="block text-sm font-medium text-black">LGA</label>
